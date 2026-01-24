@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login - Revelation 2k26</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/modern-loader.css">
+    <style>
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #18181b 0%, #23232b 100%) !important;
+            font-family: system-ui, -apple-system, sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            color: #fff !important;
+        }
+
+        .login-container {
+            width: 100%;
+            max-width: 400px;
+            padding: 20px;
+        }
+
+        .login-form {
+            padding: 32px;
+            width: 90%;
+            max-width: 400px;  /* Changed from 25% to fixed width */
+            margin: 50px auto;
+            background: #23232b !important;
+            color: #fff !important;
+            border-radius: 12px;
+            box-shadow: 0 4px 24px rgba(239,68,68,0.15);
+        }
+
+        h1 {
+            font-size: 28px;
+            font-weight: 600;
+            color: #1e293b;
+            margin: 0;
+            text-align: center;
+        }
+
+        .subtitle {
+            color: #64748b;
+            font-size: 14px;
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-group label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #1e293b;
+            margin-bottom: 8px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .form-group label i {
+            color: #1e293b;
+        }
+
+        .form-control {
+            padding: 12px;
+            background: #18181b !important;
+            color: #fff !important;
+            border: 1px solid #ef4444 !important;
+            border-radius: 8px;
+            font-size: 14px;
+            width: 100%;
+            transition: all 0.3s;
+        }
+
+        .form-control::placeholder {
+            color: #94a3b8;
+        }
+
+        .form-control:focus {
+            border-color: #ef4444 !important;
+            box-shadow: 0 0 0 2px #ef444444;
+            outline: none;
+        }
+
+        .password-input {
+            position: relative;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #94a3b8;
+            cursor: pointer;
+            padding: 0;
+        }
+
+        .login-btn,
+        #auto-fill {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            background: #ef4444 !important;
+            color: #fff !important;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            box-shadow: 0 4px 24px rgba(239,68,68,0.15);
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 10px;
+        }
+        .login-btn {
+            width: 100%;
+        }
+        #auto-fill {
+            width: auto;
+            min-width: 100px;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 10px;
+            box-shadow: 0 4px 24px rgba(239,68,68,0.15), 0 0 8px #ef4444;
+        }
+        .login-btn:hover,
+        #auto-fill:hover {
+            background: #dc2626 !important;
+            color: #fff !important;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 24px #ef4444, 0 0 8px #fff;
+        }
+
+        .alert {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 24px;
+            padding: 12px;
+            font-size: 14px;
+            border-radius: 8px;
+            background: #ef4444 !important;
+            color: #fff !important;
+        }
+
+        /* Loader styles */
+        #loader-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+
+        #loader-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .modern-loader {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+
+        .loader-ring {
+            width: 48px;
+            height: 48px;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: loaderSpin 0.6s linear infinite;
+        }
+
+        .loader-dot {
+            width: 12px;
+            height: 12px;
+            background: #fff;
+            border-radius: 50%;
+            position: absolute;
+            animation: loaderDotBounce 0.6s ease-in-out infinite;
+        }
+
+        .loader-text {
+            margin-top: 12px;
+            font-size: 14px;
+            color: #fff;
+        }
+
+        @keyframes loaderSpin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes loaderDotBounce {
+            0% {
+                transform: translateY(0);
+            }
+
+            100% {
+                transform: translateY(-18px);
+            }
+        }
+
+        .website-link {
+            color: #ef4444;
+            transition: all 0.3s;
+            text-decoration: none;
+        }
+
+        .website-link:hover {
+            color: #dc2626;
+            text-decoration: underline;
+        }
+
+        #auto-fill:hover{
+            background-color: #dc2626 !important;
+            transform: translateY(-1px);
+        }
+    </style>
+</head>
+<body>
+    <div id="loader-overlay" class="modern-loader">
+        <div class="loader-content">
+            <div class="loader-animation">
+                <div class="loader-circle"></div>
+                <div class="loader-circle"></div>
+                <div class="loader-circle"></div>
+            </div>
+            <div class="loader-text">Loading...</div>
+        </div>
+    </div>
+    <center>
+        <form id="loginForm" class="login-form">
+            <h1>Revelation 2k26</h1>
+            <p class="subtitle">Admin Panel</p>
+
+            <% if (locals.error) { %>
+                <div class="alert alert-danger">
+                    <i style="color: white;" class="fas fa-exclamation-circle"></i>
+                    <%= error %>
+                </div>
+            <% } %>
+
+            <div class="form-group">
+                <label>
+                    <i  style="color: white;" class="fas fa-user"></i>
+                    <span>Username</span>
+                </label>
+                <input type="text" name="name" required class="form-control" placeholder="Enter username">
+            </div>
+
+            <div class="form-group">
+                <label>
+                    <i  style="color: white;" class="fas fa-lock"></i>
+                    <span>Password</span>
+                </label>
+                <div class="password-input">
+                    <input type="password" name="password" required class="form-control" placeholder="Enter password">
+                    <button type="button" class="toggle-password" onclick="togglePassword(this)">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </div>
+            </div>
+
+            
+            <button type="submit" class="btn btn-primary login-btn">
+                <span>Login</span>
+                <i class="fas fa-arrow-right"></i>
+            </button>
+                <br>
+                <div>
+                    <b>Username:</b> admin@Revelation2k26
+                    <br>
+                    <b>Password:</b> Revelation2k26#
+                </div>
+                <div id="auto-fill">
+                    Auto Fill
+                </div>
+        </form>
+    </center>
+    <script src="/js/loader.js"></script>
+    <script>
+        function togglePassword(button) {
+            const input = button.parentElement.querySelector('input');
+            const icon = button.querySelector('i');
+
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.replace('fa-eye', 'fa-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.replace('fa-eye-slash', 'fa-eye');
+            }
+        }
+
+        // Loader functions
+        function showLoader() {
+            document.getElementById('loader-overlay').classList.add('active');
+        }
+        function hideLoader() {
+            document.getElementById('loader-overlay').classList.remove('active');
+        }
+        // Show loader on page load for 1s (simulate slow server)
+        document.addEventListener('DOMContentLoaded', function() {
+            showLoader();
+            setTimeout(hideLoader, 1000);
+        });
+        // Show loader on login submit
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            showLoader();
+            const formData = new FormData(e.target);
+            
+            try {
+                const response = await fetch('/admin/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(Object.fromEntries(formData))
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    localStorage.setItem('admin_token', data.token);
+                    window.location.href = data.redirect;
+                } else {
+                    alert(data.error || 'Login failed');
+                }
+                hideLoader();
+            } catch (error) {
+                hideLoader();
+                console.error('Login error:', error);
+                alert('Login failed');
+            }
+        });
+
+        // Autofill logic
+        document.getElementById('auto-fill').onclick = function() {
+            document.querySelector('input[name="name"]').value = 'admin@Revelation2k26';
+            document.querySelector('input[name="password"]').value = 'Revelation2k26#';
+        };
+    </script>
+</body>
+</html>

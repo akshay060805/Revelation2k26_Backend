@@ -1,0 +1,32 @@
+{
+  "name": "revelation2k26_backend",
+  "version": "1.0.0",
+  "description": "backend for revelation website (2026)",
+  "license": "ISC",
+  "author": "Vanama Akshay Kumar",
+  "type": "commonjs",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "bcryptjs": "^3.0.3",
+    "cloudinary": "^2.8.0",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "ejs": "^4.0.1",
+    "express": "^5.2.1",
+    "express-ejs-layouts": "^2.5.1",
+    "google-auth-library": "^10.5.0",
+    "googleapis": "^170.0.0",
+    "jsonwebtoken": "^9.0.3",
+    "method-override": "^3.0.0",
+    "mongoose": "^9.1.3",
+    "multer": "^2.0.2",
+    "nodemon": "^3.1.11",
+    "path": "^0.12.7",
+    "streamifier": "^0.1.1"
+  }
+}

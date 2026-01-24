@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Event - <%= event.name %></title>
+    <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body>
+    <div class="admin-container">
+        <% if (error) { %>
+            <div class="error-alert"><%= error %></div>
+        <% } %>
+
+        <form action="/admin/event/edit/<%= event._id %>" method="POST" enctype="multipart/form-data" class="event-form">
+            <div class="form-group">
+                <label for="name">Event Name:</label>
+                <input type="text" id="name" name="name" required value="<%= event.name %>">
+            </div>
+            
+            <div class="form-group">
+                <label for="type">Event Type:</label>
+                <select id="type" name="type" required>
+                    <option value="Single" <%= event.type === 'Single' ? 'selected' : '' %>>Single</option>
+                    <option value="Combined" <%= event.type === 'Combined' ? 'selected' : '' %>>Combined</option>
+                    <option value="Team" <%= event.type === 'Team' ? 'selected' : '' %>>Team</option>
+                </select>
+            </div>
+
+            <div class="form-group team-size" id="teamSizeDiv">
+                <label>Team Size:</label>
+                <div class="team-size-inputs">
+                    <div>
+                        <label for="minTeamSize">Minimum:</label>
+                        <input type="number" id="minTeamSize" name="teamSize[min]" required min="1"
+                            value="<%= event.teamSize.min %>">
+                    </div>
+                    <div>
+                        <label for="maxTeamSize">Maximum:</label>
+                        <input type="number" id="maxTeamSize" name="teamSize[max]" required min="1"
+                            value="<%= event.teamSize.max %>">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="description">Description:</label>
+                <textarea id="description" name="description" required rows="4"><%= event.description %></textarea>
+            </div>
+
+            <div class="form-group">
+                <label>Rules:</label>
+                <div id="rulesContainer">
+                    <% event.rules.forEach((rule, index) => { %>
+                        <div class="rule-input-group">
+                            <textarea name="rules[]" class="form-control" rows="2" required><%= rule %></textarea>
+                            <button type="button" class="remove-rule btn btn-danger" <%= event.rules.length === 1 ? 'style="display: none;"' : '' %>>Remove</button>
+                        </div>
+                    <% }); %>
+                </div>
+                <button type="button" class="btn btn-secondary mt-2" onclick="addRule()">Add Another Rule</button>
+            </div>
+            
+            <div class="form-group">
+                <label for="startTime">Start Time:</label>
+                <input type="datetime-local" id="startTime" name="startTime" required
+                    value="<%= new Date(event.startTime).toISOString().slice(0, 16) %>">
+            </div>
+
+            <div class="form-group">
+                <label for="endTime">End Time:</label>
+                <input type="datetime-local" id="endTime" name="endTime" required
+                    value="<%= new Date(event.endTime).toISOString().slice(0, 16) %>">
+            </div>
+
+            <div class="form-group">
+                <label for="venue">Venue:</label>
+                <input type="text" id="venue" name="venue" required value="<%= event.venue %>">
+            </div>
+
+            <div class="form-group">
+                <label for="registrationAmount">Registration Amount (₹):</label>
+                <input type="number" id="registrationAmount" name="registrationAmount" required min="0"
+                    value="<%= event.registrationAmount %>">
+            </div>
+            
+            
+            <div class="form-group">
+                <label for="prizePool">Prize Pool (₹):</label>
+                <input type="number" id="prizePool" name="prizePool" required min="0"
+                    value="<%= event.prizePool %>">
+            </div>
+
+            <div class="form-group">
+                <label for="registrationFrom">Registration From:</label>
+                <select id="registrationFrom" name="registrationFrom" required onchange="toggleRegistrationLink()">
+                    <option value="website" <%= event.registrationFrom === 'website' ? 'selected' : '' %>>Website</option>
+                    <option value="external" <%= event.registrationFrom === 'external' ? 'selected' : '' %>>External Link</option>
+                    <option value="notReq" <%= event.registrationFrom === 'notReq' ? 'selected' : '' %>>Not Required</option>
+                </select>
+            </div>
+
+            <div class="form-group" id="registrationLinkGroup" style="display: <%= event.registrationFrom === 'external' ? 'block' : 'none' %>">
+                <label for="registrationLink">Registration Link:</label>
+                <input type="url" id="registrationLink" name="registrationLink" 
+                    value="<%= event.registrationLink || '' %>">
+            </div>
+
+
+            <button type="submit">Update Event</button>
+        </form>
+    </div>
+
+    <script>
+        // Show/hide team size based on event type
+        const teamSizeDiv = document.querySelector('.team-size');
+        const typeSelect = document.getElementById('type');
+        
+        function updateTeamSizeVisibility() {
+            if (typeSelect.value === 'Team') {
+                teamSizeDiv.style.display = 'block';
+            } else {
+                teamSizeDiv.style.display = 'none';
+                document.getElementById('minTeamSize').value = '1';
+                document.getElementById('maxTeamSize').value = '1';
+            }
+        }
+
+        // Initialize visibility
+        updateTeamSizeVisibility();
+        
+        // Add change listener
+        typeSelect.addEventListener('change', updateTeamSizeVisibility);
+
+        function updateFileName(input, fileNameElementId) {
+            const fileNameElement = document.getElementById(fileNameElementId);
+            fileNameElement.textContent = input.files.length > 0 ? input.files[0].name : '';
+        }
+
+        function addRule() {
+            const rulesContainer = document.getElementById('rulesContainer');
+            const ruleInputGroup = document.createElement('div');
+            ruleInputGroup.className = 'rule-input-group';
+            ruleInputGroup.innerHTML = `
+                <textarea name="rules[]" class="form-control" rows="2" required></textarea>
+                <button type="button" class="remove-rule btn btn-danger">Remove</button>
+            `;
+            rulesContainer.appendChild(ruleInputGroup);
+            updateRemoveButtons();
+        }
+
+        function updateRemoveButtons() {
+            const removeButtons = document.querySelectorAll('.remove-rule');
+            removeButtons.forEach(button => {
+                button.style.display = removeButtons.length === 1 ? 'none' : 'inline-block';
+                button.addEventListener('click', () => {
+                    button.parentElement.remove();
+                    updateRemoveButtons();
+                });
+            });
+        }
+
+        updateRemoveButtons();
+
+        function toggleRegistrationLink() {
+            const registrationFrom = document.getElementById('registrationFrom').value;
+            const linkGroup = document.getElementById('registrationLinkGroup');
+            const linkInput = document.getElementById('registrationLink');
+
+            if (registrationFrom === 'external') {
+                linkGroup.style.display = 'block';
+                linkInput.required = true;
+            } else {
+                linkGroup.style.display = 'none';
+                linkInput.required = false;
+                linkInput.value = '';
+            }
+        }
+    </script>
+
+    <style>
+        .current-image {
+            margin-bottom: 12px;
+            padding: 12px;
+            background: #f8fafc;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .current-image .thumbnail {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+
+        .current-image span {
+            color: #64748b;
+            font-size: 0.875rem;
+        }
+
+        .rule-input-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .rule-input-group .form-control {
+            flex: 1;
+        }
+
+        .rule-input-group .btn {
+            flex-shrink: 0;
+        }
+    </style>
+</body>
+</html>
